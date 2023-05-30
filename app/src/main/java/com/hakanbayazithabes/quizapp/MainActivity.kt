@@ -13,11 +13,12 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root // view is the root of the layout
         setContentView(view)
 
-        binding.btnStart.setOnClickListener{
-            if (binding.etName.text.toString().isEmpty()){
+        binding.btnStart.setOnClickListener {
+            if (binding.etName.text.toString().isEmpty()) {
                 binding.etName.error = "Please enter your name"
             } else {
                 val intent = Intent(this, QuizQuestionsActivity::class.java)
+                intent.putExtra(Constants.USER_NAME, binding.etName.text.toString())
                 startActivity(intent)
                 finish()
             }

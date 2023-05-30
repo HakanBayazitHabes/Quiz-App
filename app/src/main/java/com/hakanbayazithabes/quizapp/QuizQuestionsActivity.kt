@@ -19,6 +19,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     private var mCurrentPosition: Int = 1
     private var mQuestionsList: ArrayList<Question>? = null
     private var mSelectedOptionPosition: Int = 0
+    private var mUserNAme: String? = null
+    private var mCorrectAnswers: Int = 0
 
     private lateinit var binding: ActivityQuizQuestionsBinding
 
@@ -39,6 +41,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         binding = ActivityQuizQuestionsBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        mUserNAme = intent.getStringExtra(Constants.USER_NAME)
 
         progressBar = binding.progressBar
         tvProgress = binding.tvProgress
@@ -169,11 +173,12 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
                             setQuestion()
                         }
                         else -> {
-                            Toast.makeText(
-                                this,
-                                "You have successfully completed the quiz",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            val intent = android.content.Intent(this, ResultActivity::class.java)
+                            intent.putExtra(Constants.USER_NAME, mUserNAme)
+                            intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                            intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList!!.size)
+                            startActivity(intent)
+                            finish()
                         }
                     }
                 } else {
@@ -181,9 +186,11 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
                     if (question!!.correctAnswer != mSelectedOptionPosition) {
                         answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
                     } else {
-                        answerView(mSelectedOptionPosition, R.drawable.correct_option_border_bg)
-
+                        mCorrectAnswers++
                     }
+                    answerView(mSelectedOptionPosition, R.drawable.correct_option_border_bg)
+
+
                     if (mCurrentPosition == mQuestionsList!!.size) {
                         btnSubmit?.text = "FINISH"
                     } else {
