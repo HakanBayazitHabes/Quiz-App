@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.hakanbayazithabes.quizapp.databinding.ActivityQuizQuestionsBinding
 
@@ -66,13 +67,13 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setQuestion() {
+        defaultOptionsView()
         Log.i("Questions Size", "${mQuestionsList!!.size}")
 
         for (i in mQuestionsList!!) {
             Log.e("Question", i.question)
         }
 
-        mCurrentPosition = 1
         val question: Question = mQuestionsList!![mCurrentPosition - 1]
         ivImage?.setImageResource(question.image)
         progressBar?.progress = mCurrentPosition
@@ -120,8 +121,33 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
+    private fun answerView(answer: Int, drawableView: Int) {
+        when (answer) {
+            1 -> {
+                tvOptionOne?.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            2 -> {
+                tvOptionTwo?.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            3 -> {
+                tvOptionThree?.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+            4 -> {
+                tvOptionFour?.background = ContextCompat.getDrawable(
+                    this, drawableView
+                )
+            }
+        }
+    }
+
     override fun onClick(view: View?) {
-        when(view?.id) {
+        when (view?.id) {
             R.id.tv_option_one -> {
                 selectedOptionView(tvOptionOne!!, 1)
             }
@@ -135,7 +161,38 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
                 selectedOptionView(tvOptionFour!!, 4)
             }
             R.id.btnSubmit -> {
+                if (mSelectedOptionPosition == 0) {
+                    mCurrentPosition++
 
+                    when {
+                        mCurrentPosition <= mQuestionsList!!.size -> {
+                            setQuestion()
+                        }
+                        else -> {
+                            Toast.makeText(
+                                this,
+                                "You have successfully completed the quiz",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } else {
+                    val question = mQuestionsList?.get(mCurrentPosition - 1)
+                    if (question!!.correctAnswer != mSelectedOptionPosition) {
+                        answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                    } else {
+                        answerView(mSelectedOptionPosition, R.drawable.correct_option_border_bg)
+
+                    }
+                    if (mCurrentPosition == mQuestionsList!!.size) {
+                        btnSubmit?.text = "FINISH"
+                    } else {
+                        btnSubmit?.text = "GO TO NEXT QUESTION"
+                    }
+
+                    mSelectedOptionPosition = 0
+
+                }
             }
         }
     }
